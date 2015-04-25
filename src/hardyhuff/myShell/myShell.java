@@ -1,7 +1,10 @@
 package hardyhuff.myShell;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class myShell {
 	public static void main(String[] args) throws IOException
@@ -70,8 +73,29 @@ public class myShell {
 	}
 	
 	static String cd(String arg) {
-		System.setProperty("user.dir", arg);
-		return null;
+		File file = new File(arg);
+		if(file.isDirectory() && file.exists()) {
+			try {
+				System.setProperty("user.dir", file.getCanonicalPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("1");
+			return "";
+		}
+		file = new File(System.getProperty("user.dir") + "/" + arg);
+		if(file.isDirectory() && file.exists()) {
+			try {
+				System.setProperty("user.dir", file.getCanonicalPath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("2");
+			return "";
+		}
+		return "Directory " + arg + " does not exist";
 	}
 	static String ls() {
 		return null;
