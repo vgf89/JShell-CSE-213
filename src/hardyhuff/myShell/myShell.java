@@ -79,7 +79,6 @@ public class myShell {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("1");
 			return "";
 		}
 		file = new File(System.getProperty("user.dir") + "/" + arg);
@@ -90,7 +89,6 @@ public class myShell {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("2");
 			return "";
 		}
 		return "Directory " + arg + " does not exist";
