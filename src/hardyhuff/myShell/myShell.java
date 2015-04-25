@@ -1,5 +1,6 @@
 package hardyhuff.myShell;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -21,7 +22,7 @@ public class myShell {
 				System.out.println(cd(arguments[1]));
 				break;
 			case "ls":
-				System.out.println(arguments[0]);
+				System.out.println(ls());
 				break;
 			case "cp":
 				System.out.println(arguments[0]);
@@ -74,12 +75,24 @@ public class myShell {
 		return null;
 	}
 	static String ls() {
-		return null;
+		String s="";
+		File workdir =new File(System.getProperty("user.dir"));
+		File[] fileList=workdir.listFiles();
+		for(File file : fileList){
+			if(file.isFile())
+				if(s.length()==0)
+					s= file.getName();
+				else
+					s= s+" "+file.getName();
+		}
+		
+		return s;
 	}
 	static String cp(String arg1, String arg2) {
 		return null;
 	}
 	static String mv(String arg1, String arg2) {
+		
 		return null;
 	}
 	static String rm(String arg) {
