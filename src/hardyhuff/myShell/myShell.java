@@ -178,6 +178,7 @@ public class myShell {
 				e.printStackTrace();
 				return "Failed to remove file " + arg;
 			}
+			return "";
 		}
 		
 		file = new File(System.getProperty("user.dir") + "/" + arg);
