@@ -18,7 +18,7 @@ public class myShell {
 			switch(arguments[0])
 			{
 			case "cd":
-				System.out.println(arguments[0]);
+				System.out.println(cd(arguments[1]));
 				break;
 			case "ls":
 				System.out.println(arguments[0]);
@@ -69,46 +69,47 @@ public class myShell {
 		}
 	}
 	
-	String cd(String arg) {
+	static String cd(String arg) {
+		System.setProperty("user.dir", arg);
 		return null;
 	}
-	String ls() {
+	static String ls() {
 		return null;
 	}
-	String cp(String arg1, String arg2) {
+	static String cp(String arg1, String arg2) {
 		return null;
 	}
-	String mv(String arg1, String arg2) {
+	static String mv(String arg1, String arg2) {
 		return null;
 	}
-	String rm(String arg) {
+	static String rm(String arg) {
 		return null;
 	}
-	String diff (String arg1, String arg2) {
+	static String diff (String arg1, String arg2) {
 		return null;
 	}
-	String more(String arg) {
+	static String more(String arg) {
 		return null;
 	}
-	String wc(String arg) {
+	static String wc(String arg) {
 		return null;
 	}
-	String mkdir(String arg) {
+	static String mkdir(String arg) {
 		return null;
 	}
-	String grep(String[] args) {
+	static String grep(String[] args) {
 		return null;
 	}
-	String ps() {
+	static String ps() {
 		return null;
 	}
-	String kill(String arg) {
+	static String kill(String arg) {
 		return null;
 	}
-	String whoami(String arg) {
+	static String whoami(String arg) {
 		return null;
 	}
-	String env() {
+	static String env() {
 		return null;
 	}
 }
