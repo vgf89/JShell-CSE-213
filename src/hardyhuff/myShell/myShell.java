@@ -96,8 +96,8 @@ public class myShell {
 	}
 	
 	static String ls() {
-		String s="";
-		File workdir =new File(System.getProperty("user.dir"));
+		String s = "";
+		File workdir = new File(System.getProperty("user.dir"));
 		String[] fileList = workdir.list();
 		for (String file : fileList) {
 			if (s.length() == 0)
@@ -178,6 +178,7 @@ public class myShell {
 				e.printStackTrace();
 				return "Failed to remove file " + arg;
 			}
+			return "";
 		}
 		
 		file = new File(System.getProperty("user.dir") + "/" + arg);
