@@ -12,7 +12,7 @@ public class myShell {
 		String[] arguments;
 		
 		while(true) {
-			System.out.println(System.getProperty("user.dir") + "$ ");
+			System.out.print(System.getProperty("user.dir") + "$ ");
 			s = input.readLine();
 			arguments = s.split(" ");
 			switch(arguments[0])
@@ -67,5 +67,48 @@ public class myShell {
 				System.out.println("Unknown Command!");
 			}
 		}
+	}
+	
+	String cd(String arg) {
+		return null;
+	}
+	String ls() {
+		return null;
+	}
+	String cp(String arg1, String arg2) {
+		return null;
+	}
+	String mv(String arg1, String arg2) {
+		return null;
+	}
+	String rm(String arg) {
+		return null;
+	}
+	String diff (String arg1, String arg2) {
+		return null;
+	}
+	String more(String arg) {
+		return null;
+	}
+	String wc(String arg) {
+		return null;
+	}
+	String mkdir(String arg) {
+		return null;
+	}
+	String grep(String[] args) {
+		return null;
+	}
+	String ps() {
+		return null;
+	}
+	String kill(String arg) {
+		return null;
+	}
+	String whoami(String arg) {
+		return null;
+	}
+	String env() {
+		return null;
 	}
 }
