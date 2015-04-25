@@ -1,10 +1,12 @@
 package hardyhuff.myShell;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class myShell {
 	public static void main(String[] args) throws IOException
@@ -30,6 +32,7 @@ public class myShell {
 				System.out.println(arguments[0]);
 				break;
 			case "mv":
+				mv(arguments[1],arguments[2]);
 				System.out.println(arguments[0]);
 				break;
 			case "rm":
@@ -78,7 +81,7 @@ public class myShell {
 			try {
 				System.setProperty("user.dir", file.getCanonicalPath());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			System.out.println("1");
@@ -89,8 +92,7 @@ public class myShell {
 			try {
 				System.setProperty("user.dir", file.getCanonicalPath());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+					e.printStackTrace();
 			}
 			System.out.println("2");
 			return "";
@@ -103,7 +105,6 @@ public class myShell {
 		File[] fileList=workdir.listFiles();
 		for(File file : fileList){
 			if(file.isFile())
-				if(s.length()==0)
 					s= file.getName();
 				else
 					s= s+" "+file.getName();
@@ -115,11 +116,35 @@ public class myShell {
 		return null;
 	}
 	static String mv(String arg1, String arg2) {
+		File mv=new File(arg1);
+		File des=new File(arg2);
+		System.out.println("made it");
+		if(mv.isFile()){
+			try {
+				Files.move(mv.toPath(),des.toPath(),StandardCopyOption.REPLACE_EXISTING);
+				
+			} catch (IOException e) {
+				
+				return e.toString();
+			}
+			return "";
+		}
 		
+		mv=new File(System.getProperty("user.dir") + "/" + arg1);
+		if(mv.isFile()){
+			try {
+				Files.move(mv.toPath(),des.toPath(),StandardCopyOption.REPLACE_EXISTING);
+				
+			} catch (IOException e) {
+				
+				return e.toString();
+			}
+			return "";
+		}
 		return null;
 	}
 	static String rm(String arg) {
-		return null;
+		return "";
 	}
 	static String diff (String arg1, String arg2) {
 		return null;
@@ -128,6 +153,22 @@ public class myShell {
 		return null;
 	}
 	static String wc(String arg) {
+		BufferedReader in = null;
+		String a;
+		try{
+			in = new BufferedReader(new FileReader(arg));
+			
+		}catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		
+		try {
+			in.close();
+		} catch (IOException e) {
+			
+			return e.toString();
+		}
 		return null;
 	}
 	static String mkdir(String arg) {
