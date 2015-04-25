@@ -96,14 +96,14 @@ public class myShell {
 	}
 	
 	static String ls() {
-		String s="";
-		File workdir =new File(System.getProperty("user.dir"));
-		File[] fileList=workdir.listFiles();
-		for(File file : fileList){
-			if(file.isFile())
-					s= file.getName();
-				else
-					s= s+" "+file.getName();
+		String s = "";
+		File workdir = new File(System.getProperty("user.dir"));
+		String[] fileList = workdir.list();
+		for (String file : fileList) {
+			if (s.length() == 0)
+				s += file;
+			else
+				s += " " + file;
 		}
 		
 		return s;
