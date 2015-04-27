@@ -1,6 +1,7 @@
 package hardyhuff.myShell;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,13 +56,13 @@ public class myShell {
 				System.out.println(arguments[0]);
 				break;
 			case "ps":
-				System.out.println(arguments[0]);
+				System.out.println(ps());
 				break;
 			case "kill":
 				System.out.println(arguments[0]);
 				break;
 			case "whoami":
-				System.out.println(arguments[0]);
+				System.out.println(whoami());
 				break;
 			case "env":
 				System.out.println(System.getenv());
@@ -217,8 +218,13 @@ public class myShell {
 			in = new BufferedReader(new FileReader(arg));
 			
 		}catch (IOException e) {
-			return e.toString();
+			try {
+				in = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/" + arg));
+			} catch (FileNotFoundException e1) {
+				return e1.toString();
+				
 			}
+		}
 		try {
 			while((a=in.readLine()) != null){
 				words=a.split(" ");
@@ -252,15 +258,38 @@ public class myShell {
 	}
 	
 	static String ps() {
-		return null;
+		String[] a=System.getProperty("os.name").split(" ");
+		try {
+	        String line;
+	        Process p;
+			switch (a[0]){
+			case "Windows":
+				p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+				break;
+			default:
+				p = Runtime.getRuntime().exec("ps -e");
+				break;
+			}
+	        BufferedReader input =
+	                new BufferedReader(new InputStreamReader(p.getInputStream()));
+	        while ((line = input.readLine()) != null) {
+	            System.out.println(line); //<-- Parse data here.
+	        }
+	        input.close();
+	    } catch (Exception err) {
+	        return err.toString();
+	    }
+		
+		
+		return "";
 	}
 	
 	static String kill(String arg) {
 		return null;
 	}
 	
-	static String whoami(String arg) {
-		return null;
+	static String whoami() {
+		return System.getProperty("user.name");
 	}
 	
 	static String env() {
