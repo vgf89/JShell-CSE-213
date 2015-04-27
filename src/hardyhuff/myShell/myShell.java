@@ -42,7 +42,8 @@ public class myShell {
 				System.out.println(arguments[0]);
 				break;
 			case "wc":
-				System.out.println(arguments[0]);
+				System.out.println(wc(arguments[1]));
+				
 				break;
 			case "mkdir":
 				System.out.println(arguments[0]);
@@ -208,21 +209,37 @@ public class myShell {
 	static String wc(String arg) {
 		BufferedReader in = null;
 		String a;
+		String[] words;
+		int cha=0;
+		int word=0;
+		int lines=0;
 		try{
 			in = new BufferedReader(new FileReader(arg));
 			
 		}catch (IOException e) {
-				e.printStackTrace();
+			return e.toString();
 			}
-		
-		
+		try {
+			while((a=in.readLine()) != null){
+				words=a.split(" ");
+				word+=words.length;
+				lines++;
+				for(int t=0;t<words.length;t++){
+					a=words[t];
+					cha+=a.length();
+				}
+				
+			}
+		} catch (IOException e1) {
+			return e1.toString();
+		}
 		try {
 			in.close();
 		} catch (IOException e) {
 			
 			return e.toString();
 		}
-		return null;
+		return ("number of characters: "+cha+"\nnumber of words: "+word+"\nnumber of lines: "+lines);
 	}
 	
 	static String mkdir(String arg) {
