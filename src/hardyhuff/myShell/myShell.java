@@ -1,5 +1,6 @@
 package hardyhuff.myShell;
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,9 +12,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 public class myShell {
+
+	static BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+	
+	
 	public static void main(String[] args) throws IOException
 	{
-		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		String[] arguments;
 		
 		while(true) {
@@ -32,7 +36,6 @@ public class myShell {
 				break;
 			case "mv":
 				mv(arguments[1],arguments[2]);
-				System.out.println(arguments[0]);
 				break;
 			case "rm":
 				System.out.println(rm(arguments[1]));
@@ -41,7 +44,7 @@ public class myShell {
 				System.out.println(arguments[0]);
 				break;
 			case "more":
-				System.out.println(arguments[0]);
+				System.out.println(more(arguments[1], 80, 10));
 				break;
 			case "wc":
 				System.out.println(wc(arguments[1]));
@@ -70,7 +73,7 @@ public class myShell {
 			case "exit":
 				return;
 			default:
-				System.out.println("Unknown Command!");
+				System.out.println("Unknown Command");
 			}
 		}
 	}
@@ -205,40 +208,35 @@ public class myShell {
 	
 	//TODO: figure this out for GUI
 	static String more(String arg, int width, int height) {
-		BufferedReader in = null;
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		BufferedReader filein;
+		try {
+			filein = new BufferedReader(new FileReader(arg));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return "Failed";
+		}
 		String line;
 		int lines = 0;
-		String screen = null;
+		String screen = "";
 		
 		try {
-			in = new BufferedReader(new FileReader(arg));
-		} catch (IOException e) {
-			return "Could no open file " + arg;
-		}
-		
-		int i = 0;
-		//TODO: look for \n in stdin to continue loop
-		while (lines < height){
-			try {
-				while ((line = in.readLine()) != null) {
-					for (char c : line.toCharArray()) {
-						if (i >= width && c != '\n') {
-							screen += '\n' + c;
-							i = 0;
-							lines++;
-						} else if (c == '\n') {
-							screen += c;
-							i = 0;
-							lines++;
-						} else {
-							screen += c;
-							i++;
-						}
+			do  {
+				while (lines <= height && filein.ready()) {
+					line = filein.readLine();
+					while (line != null && line.length() > width) {
+						screen += line.substring(0, width - 2) + "\n";
+						line = line.substring(width - 1);
+						lines++;
 					}
+					screen += line + "\n";
+					lines++;
 				}
-			} catch (IOException e) {
-				return "Failed to read file " + arg;
-			}
+				System.out.println(screen);
+			} while (stdin.readLine() != null && filein.ready());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return "";
 	}
