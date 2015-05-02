@@ -61,7 +61,7 @@ public class myShell {
 				grep(arguments);
 				break;
 			case "talk":
-				output.println(arguments[0]);
+				talk(arguments[1]);
 				break;
 			case "ps":
 				output.println(ps());
@@ -74,10 +74,6 @@ public class myShell {
 				break;
 			case "env":
 				output.println(env());
-				break;
-			case "socket":
-				if(socket()==-1)
-					output.println("error has ocurred");
 				break;
 			case "exit":
 				return;
@@ -404,42 +400,46 @@ public class myShell {
 	}
 	
 	
-	static int socket() {
-		ServerSocket server = null;
-		Socket client = null;
+	static int talk(String arg) {
+		String[] args = arg.split(":");
+		if (args.length != 2){
+			output.println("argument " + arg + " is not correct");
+			return -1;
+		}
+		
+		ServerSocket listener = null;
+		Socket echoSocket = null;
 		BufferedReader in = null; 
-		PrintWriter out= null; 
-		try{
-		    server = new ServerSocket(4321); 
-		  } catch (IOException e) {
-		    output.println("Could not listen on port 4321");
-		    return-1;
-		  }
-
-		  try{
-		    client = server.accept();
-		  } catch (IOException e) {
-		    output.println("Accept failed: 4321");
-		    return-1;
-		  }
-
+		PrintWriter out = null;
+		Socket clientSocket;
 		
-		  try{
-		   in = new BufferedReader(new InputStreamReader(
-		                           client.getInputStream()));
-		   out = new PrintWriter(client.getOutputStream(), true);
-		  } catch (IOException e) {
-		    output.println("Read failed");
-		    return-1;
-		  }
-		  
-		input = in;
-		output = out;
-		  
-		return 0;
+		//client
+		try {
+			echoSocket = new Socket(args[0], Integer.parseInt(args[1]));
+			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
+			//out = new PrintWriter(echoSocket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
+			input = in;
+			//output = out;
+			return 0;
+		} catch (Exception e) {
+			output.println("Could not connect to " + args[0] + ":" + args[1]);
+			output.println("Creating server");
+		}
 		
+		//server
+		try {
+			listener = new ServerSocket(Integer.parseInt(args[1]));
+			clientSocket = listener.accept();
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			output = out;
 
-		    		    
+		} catch (Exception e) {
+			output.println("Could not connect to " + args[0] + ":" + args[1]);
+			return -1;
+		}
+		return 0;    
 	}
 }	
 
