@@ -204,7 +204,42 @@ public class myShell {
 	
 	//TODO: figure this out for GUI
 	static String more(String arg, int width, int height) {
-		return null;
+		BufferedReader in = null;
+		String line;
+		int lines = 0;
+		String screen = null;
+		
+		try {
+			in = new BufferedReader(new FileReader(arg));
+		} catch (IOException e) {
+			return "Could no open file " + arg;
+		}
+		
+		int i = 0;
+		//TODO: look for \n in stdin to continue loop
+		while (lines < height){
+			try {
+				while ((line = in.readLine()) != null) {
+					for (char c : line.toCharArray()) {
+						if (i >= width && c != '\n') {
+							screen += '\n' + c;
+							i = 0;
+							lines++;
+						} else if (c == '\n') {
+							screen += c;
+							i = 0;
+							lines++;
+						} else {
+							screen += c;
+							i++;
+						}
+					}
+				}
+			} catch (IOException e) {
+				return "Failed to read file " + arg;
+			}
+		}
+		return "";
 	}
 	
 	static String wc(String arg) {
