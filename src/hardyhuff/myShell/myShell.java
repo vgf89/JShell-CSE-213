@@ -27,6 +27,8 @@ public class myShell {
 			arguments = input.readLine().split(" ");
 			switch(arguments[0])
 			{
+			case "":
+				break;
 			case "cd":
 				System.out.println(cd(arguments[1]));
 				break;
@@ -288,8 +290,9 @@ public class myShell {
 	}
 	
 	static String mkdir(String arg) {
-		File file = new File(arg);
-		return null;
+		if (! (new File(System.getProperty("user.dir") + "/" + arg).mkdir()))
+			return "Failed to create directory";
+		return "";
 	}
 	
 	static String grep(String[] args) {
