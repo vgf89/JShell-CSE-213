@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 public class myShell {
 	public static void main(String[] args) throws IOException
@@ -44,10 +45,9 @@ public class myShell {
 				break;
 			case "wc":
 				System.out.println(wc(arguments[1]));
-				
 				break;
 			case "mkdir":
-				System.out.println(arguments[0]);
+				System.out.println(mkdir(arguments[1]));
 				break;
 			case "grep":
 				grep(arguments);
@@ -59,13 +59,14 @@ public class myShell {
 				System.out.println(ps());
 				break;
 			case "kill":
-				System.out.println(arguments[0]);
+				System.out.println(kill(arguments[1]));
 				break;
 			case "whoami":
 				System.out.println(whoami());
 				break;
 			case "env":
-				System.out.println(System.getenv());
+				System.out.println(env());
+				break;
 			case "exit":
 				return;
 			default:
@@ -204,7 +205,42 @@ public class myShell {
 	
 	//TODO: figure this out for GUI
 	static String more(String arg, int width, int height) {
-		return null;
+		BufferedReader in = null;
+		String line;
+		int lines = 0;
+		String screen = null;
+		
+		try {
+			in = new BufferedReader(new FileReader(arg));
+		} catch (IOException e) {
+			return "Could no open file " + arg;
+		}
+		
+		int i = 0;
+		//TODO: look for \n in stdin to continue loop
+		while (lines < height){
+			try {
+				while ((line = in.readLine()) != null) {
+					for (char c : line.toCharArray()) {
+						if (i >= width && c != '\n') {
+							screen += '\n' + c;
+							i = 0;
+							lines++;
+						} else if (c == '\n') {
+							screen += c;
+							i = 0;
+							lines++;
+						} else {
+							screen += c;
+							i++;
+						}
+					}
+				}
+			} catch (IOException e) {
+				return "Failed to read file " + arg;
+			}
+		}
+		return "";
 	}
 	
 	static String wc(String arg) {
@@ -317,7 +353,33 @@ public class myShell {
 	}
 	
 	static String kill(String arg) {
-		return null;
+			try {
+				Runtime r = Runtime.getRuntime();
+				
+				String[] OS = System.getProperty("os.name").split(" ");
+				Process p;
+				switch (OS[0]){
+				case "Windows":
+					p = r.exec("tasklist " + arg);
+					break;
+				default:
+					p = r.exec("kill " + arg);
+					break;
+				}
+				
+				p.waitFor();
+				BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				
+				String outputP = "";
+				String out = "";
+				while ((outputP = b.readLine()) != null) 
+					out += outputP + "\n";
+				return out;
+			} catch (IOException e) {
+				return "Process could not be killed";
+			} catch (InterruptedException e) {
+				return "Interrupted while killing process";
+			}
 	}
 	
 	static String whoami() {
@@ -325,6 +387,10 @@ public class myShell {
 	}
 	
 	static String env() {
-		return null;
+		Map<String, String> env = System.getenv();
+		String output = "";
+		for (Map.Entry<String, String> entry : env.entrySet())
+			output += entry.getKey() + "=" + entry.getValue() + "\n";
+		return output;
 	}
 }
