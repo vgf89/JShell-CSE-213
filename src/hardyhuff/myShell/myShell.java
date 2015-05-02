@@ -46,7 +46,7 @@ public class myShell {
 				output.println(rm(arguments[1]));
 				break;
 			case "diff":
-				output.println(arguments[0]);
+				diff (arguments[1], arguments[2]);
 				break;
 			case "more":
 				output.println(more(arguments[1], 80, 10));
@@ -208,7 +208,31 @@ public class myShell {
 	}
 	
 	static String diff (String arg1, String arg2) {
-		return null;
+		String[] a=System.getProperty("os.name").split(" ");
+		try {
+	        String line;
+	        Process p;
+			switch (a[0]){
+			case "Windows":
+				p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"FC " +arg1+" "+arg2);
+				break;
+			default:
+				p = Runtime.getRuntime().exec("diff " + arg1 +" "+arg2);
+				break;
+			}
+	        BufferedReader input =
+	                new BufferedReader(new InputStreamReader(p.getInputStream()));
+	        while ((line = input.readLine()) != null) {
+	            output.println(line); //<-- Parse data here.
+	        }
+	        input.close();
+	    } catch (Exception err) {
+	        return err.toString();
+	    }
+		
+		
+		return "";
+	
 	}
 	
 	//TODO: figure this out for GUI
