@@ -16,69 +16,71 @@ import java.net.ServerSocket;
 public class myShell {
 
 	static BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-	
+	static PrintWriter output = new PrintWriter(System.out, true);
 	
 	public static void main(String[] args) throws IOException
 	{
 		String[] arguments;
 		
 		while(true) {
-			System.out.print(System.getProperty("user.dir") + "$ ");
+			output.print(System.getProperty("user.dir") + "$ ");
+			output.flush();
 			arguments = input.readLine().split(" ");
 			switch(arguments[0])
 			{
 			case "cd":
-				System.out.println(cd(arguments[1]));
+				output.println(cd(arguments[1]));
 				break;
 			case "ls":
-				System.out.println(ls());
+				output.println(ls());
 				break;
 			case "cp":
-				System.out.println(cp(arguments[1], arguments[2]));
+				output.println(cp(arguments[1], arguments[2]));
 				break;
 			case "mv":
 				mv(arguments[1],arguments[2]);
 				break;
 			case "rm":
-				System.out.println(rm(arguments[1]));
+				output.println(rm(arguments[1]));
 				break;
 			case "diff":
-				System.out.println(arguments[0]);
+				output.println(arguments[0]);
 				break;
 			case "more":
-				System.out.println(more(arguments[1], 80, 10));
+				output.println(more(arguments[1], 80, 10));
 				break;
 			case "wc":
-				System.out.println(wc(arguments[1]));
+				output.println(wc(arguments[1]));
 				break;
 			case "mkdir":
-				System.out.println(mkdir(arguments[1]));
+				output.println(mkdir(arguments[1]));
 				break;
 			case "grep":
 				grep(arguments);
 				break;
 			case "talk":
-				System.out.println(arguments[0]);
+				output.println(arguments[0]);
 				break;
 			case "ps":
-				System.out.println(ps());
+				output.println(ps());
 				break;
 			case "kill":
-				System.out.println(kill(arguments[1]));
+				output.println(kill(arguments[1]));
 				break;
 			case "whoami":
-				System.out.println(whoami());
+				output.println(whoami());
 				break;
 			case "env":
-				System.out.println(env());
+				output.println(env());
 				break;
 			case "socket":
-				socket();
+				if(socket()==-1)
+					output.println("error has ocurred");
 				break;
 			case "exit":
 				return;
 			default:
-				System.out.println("Unknown Command");
+				output.println("Unknown Command");
 			}
 		}
 	}
@@ -153,7 +155,7 @@ public class myShell {
 	static String mv(String arg1, String arg2) {
 		File mv=new File(arg1);
 		File des=new File(arg2);
-		System.out.println("made it");
+		
 		if(mv.isFile()){
 			try {
 				Files.move(mv.toPath(),des.toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -185,7 +187,7 @@ public class myShell {
 			try {
 				Files.delete(file.toPath());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 				return "Failed to remove file " + arg;
 			}
@@ -197,7 +199,7 @@ public class myShell {
 			try {
 				Files.delete(file.toPath());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 				return "Failed to remove file " + arg;
 			}
@@ -238,7 +240,7 @@ public class myShell {
 					screen += line + "\n";
 					lines++;
 				}
-				System.out.println(screen);
+				output.println(screen);
 			} while (stdin.readLine() != null && filein.ready());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -310,7 +312,7 @@ public class myShell {
 				try {
 					while((a = in.readLine()) != null){
 						if( a.contains( args[1] )){
-							System.out.println(a);
+							output.println(a);
 						}
 							
 						
@@ -345,7 +347,7 @@ public class myShell {
 	        BufferedReader input =
 	                new BufferedReader(new InputStreamReader(p.getInputStream()));
 	        while ((line = input.readLine()) != null) {
-	            System.out.println(line); //<-- Parse data here.
+	            output.println(line); //<-- Parse data here.
 	        }
 	        input.close();
 	    } catch (Exception err) {
@@ -407,15 +409,15 @@ public class myShell {
 		try{
 		    server = new ServerSocket(4321); 
 		  } catch (IOException e) {
-		    System.out.println("Could not listen on port 4321");
-		    System.exit(-1);
+		    output.println("Could not listen on port 4321");
+		    return-1;
 		  }
 
 		  try{
 		    client = server.accept();
 		  } catch (IOException e) {
-		    System.out.println("Accept failed: 4321");
-		    System.exit(-1);
+		    output.println("Accept failed: 4321");
+		    return-1;
 		  }
 
 		
@@ -424,24 +426,17 @@ public class myShell {
 		                           client.getInputStream()));
 		   out = new PrintWriter(client.getOutputStream(), true);
 		  } catch (IOException e) {
-		    System.out.println("Read failed");
-		    System.exit(-1);
+		    output.println("Read failed");
+		    return-1;
 		  }
+		  
+		input = in;
+		output = out;
+		  
+		return 0;
 		
 
-		    while(true){
-		      try{
-		    	String line;
-		        line = in.readLine();
-		//Send data back to client
-		        out.println(line);
-		        
-		      } catch (IOException e) {
-		        System.out.println("Read failed");
-		        System.exit(-1);
-		      }
-		    }
-		    
+		    		    
 	}
 }	
 
