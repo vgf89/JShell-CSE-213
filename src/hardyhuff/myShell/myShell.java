@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.net.Socket;
+import java.net.ServerSocket;
 
 public class myShell {
 
@@ -53,7 +55,7 @@ public class myShell {
 				System.out.println(mkdir(arguments[1]));
 				break;
 			case "grep":
-				System.out.println(arguments[0]);
+				grep(arguments);
 				break;
 			case "talk":
 				System.out.println(arguments[0]);
@@ -69,6 +71,9 @@ public class myShell {
 				break;
 			case "env":
 				System.out.println(env());
+				break;
+			case "socket":
+				socket();
 				break;
 			case "exit":
 				return;
@@ -288,7 +293,40 @@ public class myShell {
 	}
 	
 	static String grep(String[] args) {
-		return null;
+			String a;
+			BufferedReader in = null;
+			for(int i=2;i<args.length;i++){
+				try{
+					in = new BufferedReader(new FileReader(args[i]));
+					
+				}catch (IOException e) {
+					try {
+						in = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/" + args[i]));
+					} catch (FileNotFoundException e1) {
+						return e1.toString();
+						
+					}
+				}
+				try {
+					while((a = in.readLine()) != null){
+						if( a.contains( args[1] )){
+							System.out.println(a);
+						}
+							
+						
+					}
+				} catch (IOException e1) {
+					return e1.toString();
+				}
+				try {
+					in.close();
+				} catch (IOException e) {
+					
+					return e.toString();
+				}
+			}
+			
+		return "";
 	}
 	
 	static String ps() {
@@ -359,4 +397,52 @@ public class myShell {
 			output += entry.getKey() + "=" + entry.getValue() + "\n";
 		return output;
 	}
-}
+	
+	
+	static int socket() {
+		ServerSocket server = null;
+		Socket client = null;
+		BufferedReader in = null; 
+		PrintWriter out= null; 
+		try{
+		    server = new ServerSocket(4321); 
+		  } catch (IOException e) {
+		    System.out.println("Could not listen on port 4321");
+		    System.exit(-1);
+		  }
+
+		  try{
+		    client = server.accept();
+		  } catch (IOException e) {
+		    System.out.println("Accept failed: 4321");
+		    System.exit(-1);
+		  }
+
+		
+		  try{
+		   in = new BufferedReader(new InputStreamReader(
+		                           client.getInputStream()));
+		   out = new PrintWriter(client.getOutputStream(), true);
+		  } catch (IOException e) {
+		    System.out.println("Read failed");
+		    System.exit(-1);
+		  }
+		
+
+		    while(true){
+		      try{
+		    	String line;
+		        line = in.readLine();
+		//Send data back to client
+		        out.println(line);
+		        
+		      } catch (IOException e) {
+		        System.out.println("Read failed");
+		        System.exit(-1);
+		      }
+		    }
+		    
+	}
+}	
+
+
