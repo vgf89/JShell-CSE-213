@@ -50,7 +50,7 @@ public class myShell {
 				System.out.println(arguments[0]);
 				break;
 			case "grep":
-				System.out.println(arguments[0]);
+				grep(arguments);
 				break;
 			case "talk":
 				System.out.println(arguments[0]);
@@ -254,7 +254,39 @@ public class myShell {
 	}
 	
 	static String grep(String[] args) {
-		return null;
+			String a;
+			BufferedReader in = null;
+			for(int i=2;i<args.length;i++){
+				try{
+					in = new BufferedReader(new FileReader(args[i]));
+					
+				}catch (IOException e) {
+					try {
+						in = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/" + args[i]));
+					} catch (FileNotFoundException e1) {
+						return e1.toString();
+						
+					}
+				}
+				try {
+					while((a = in.readLine()) != null){
+						if( a.contains( args[1] )){
+							System.out.println(a);
+						}
+							
+						
+					}
+				} catch (IOException e1) {
+					return e1.toString();
+				}
+				try {
+					in.close();
+				} catch (IOException e) {
+					
+					return e.toString();
+				}
+			}	
+		return "";
 	}
 	
 	static String ps() {
