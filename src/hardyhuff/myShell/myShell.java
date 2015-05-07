@@ -1,6 +1,6 @@
 package hardyhuff.myShell;
+
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,103 +10,96 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.util.Scanner;
 import java.net.Socket;
 import java.net.ServerSocket;
 
 public class myShell {
-
-	static BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-	static PrintWriter output = new PrintWriter(System.out, true);
-	
-	public static void main(String[] args) throws IOException
-	{
+	public String runCommand(String command) {
 		String[] arguments;
-		
-		while(true) {
-			output.print(System.getProperty("user.dir") + "$ ");
-			output.flush();
-			arguments = input.readLine().split(" ");
-			switch(arguments[0])
-			{
-			case "":
-				break;
-			case "cd":
-				output.println(cd(arguments[1]));
-				break;
-			case "ls":
-				output.println(ls());
-				break;
-			case "cp":
-				output.println(cp(arguments[1], arguments[2]));
-				break;
-			case "mv":
-				mv(arguments[1],arguments[2]);
-				break;
-			case "rm":
-				output.println(rm(arguments[1]));
-				break;
-			case "diff":
-				diff (arguments[1], arguments[2]);
-				break;
-			case "more":
-				output.println(more(arguments[1], 80, 10));
-				break;
-			case "wc":
-				output.println(wc(arguments[1]));
-				break;
-			case "mkdir":
-				output.println(mkdir(arguments[1]));
-				break;
-			case "grep":
-				grep(arguments);
-				break;
-			case "talk":
-				talk(arguments[1]);
-				break;
-			case "ps":
-				output.println(ps());
-				break;
-			case "kill":
-				output.println(kill(arguments[1]));
-				break;
-			case "whoami":
-				output.println(whoami());
-				break;
-			case "env":
-				output.println(env());
-				break;
-			case "exit":
-				return;
-			default:
-				output.println("Unknown Command");
-			}
+		String output = command + "\n";
+		arguments = command.split(" ");
+		switch (arguments[0]) {
+		case "":
+			break;
+		case "cd":
+			output = cd(arguments[1]);
+			break;
+		case "ls":
+			output += ls();
+			break;
+		case "cp":
+			output += cp(arguments[1], arguments[2]);
+			break;
+		case "mv":
+			output += mv(arguments[1], arguments[2]);
+			break;
+		case "rm":
+			output += rm(arguments[1]);
+			break;
+		case "diff":
+			output += diff(arguments[1], arguments[2]);
+			break;
+		case "more":
+			output += more(arguments[1], 80, 10);
+			break;
+		case "wc":
+			output += wc(arguments[1]);
+			break;
+		case "mkdir":
+			output += mkdir(arguments[1]);
+			break;
+		case "grep":
+			grep(arguments);
+			break;
+		case "talk":
+			talk(arguments[1]);
+			break;
+		case "ps":
+			output += ps();
+			break;
+		case "kill":
+			output += kill(arguments[1]);
+			break;
+		case "whoami":
+			output += whoami();
+			break;
+		case "env":
+			output += env();
+			break;
+		case "exit":
+			System.exit(0);
+		default:
+			output += "Unknown Command" + "\n";
 		}
+		output += System.getProperty("user.dir") + "$ ";
+		return output;
 	}
-	
-	static String cd(String arg) {
+
+	String cd(String arg) {
 		File file = new File(arg);
-		if(file.isDirectory() && file.exists()) {
+		if (file.isDirectory() && file.exists()) {
 			try {
 				System.setProperty("user.dir", file.getCanonicalPath());
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
 			}
-			return "";
+			return "" + "\n";
 		}
 		file = new File(System.getProperty("user.dir") + "/" + arg);
-		if(file.isDirectory() && file.exists()) {
+		if (file.isDirectory() && file.exists()) {
 			try {
 				System.setProperty("user.dir", file.getCanonicalPath());
 			} catch (IOException e) {
-					e.printStackTrace();
+				e.printStackTrace();
 			}
-			return "";
+			return "" + "\n";
 		}
 		return "Directory " + arg + " does not exist";
 	}
-	
-	static String ls() {
+
+	String ls() {
 		String s = "";
 		File workdir = new File(System.getProperty("user.dir"));
 		String[] fileList = workdir.list();
@@ -116,128 +109,137 @@ public class myShell {
 			else
 				s += " " + file;
 		}
-		
-		return s;
+
+		return s + "\n";
 	}
-	
-	static String cp(String arg1, String arg2) {
+
+	String cp(String arg1, String arg2) {
 		File in = new File(arg1);
 		if (in.isFile()) {
 			File out = new File(arg2);
 			try {
-				Files.copy(in.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(in.toPath(), out.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return "Failed to copy file " + arg1 + " to " + arg2;
+				return "Failed to copy file " + arg1 + " to " + arg2 + "\n";
 			}
-			return "";
+			return "" + "\n";
 		}
-		
+
 		in = new File(System.getProperty("user.dir") + "/" + arg1);
 		if (in.isFile()) {
 			File out = new File(arg2);
 			try {
-				Files.copy(in.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(in.toPath(), out.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return "Failed to copy file " + arg1 + " to " + arg2;
+				return "Failed to copy file " + arg1 + " to " + arg2 + "\n";
 			}
-			return "";
+			return "" + "\n";
 		}
-		
-		return "File " + arg1 + " not found";
+
+		return "File " + arg1 + " not found" + "\n";
 	}
-	
-	static String mv(String arg1, String arg2) {
-		File mv=new File(arg1);
-		File des=new File(arg2);
-		
-		if(mv.isFile()){
+
+	String mv(String arg1, String arg2) {
+		File mv = new File(arg1);
+		File des = new File(arg2);
+
+		if (mv.isFile()) {
 			try {
-				Files.move(mv.toPath(),des.toPath(),StandardCopyOption.REPLACE_EXISTING);
-				
+				Files.move(mv.toPath(), des.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
+
 			} catch (IOException e) {
-				
+
 				return e.toString();
 			}
-			return "";
+			return "" + "\n";
 		}
-		
-		mv=new File(System.getProperty("user.dir") + "/" + arg1);
-		if(mv.isFile()){
+
+		mv = new File(System.getProperty("user.dir") + "/" + arg1);
+		if (mv.isFile()) {
 			try {
-				Files.move(mv.toPath(),des.toPath(),StandardCopyOption.REPLACE_EXISTING);
-				
+				Files.move(mv.toPath(), des.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
+
 			} catch (IOException e) {
-				
+
 				return e.toString();
 			}
-			return "";
+			return "" + "\n";
 		}
 		return null;
 	}
-	
-	static String rm(String arg) {
+
+	String rm(String arg) {
 		File file = new File(arg);
 		if (file.isFile()) {
 			try {
 				Files.delete(file.toPath());
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
-				return "Failed to remove file " + arg;
+				return "Failed to remove file " + arg + "\n";
 			}
 			return "";
 		}
-		
+
 		file = new File(System.getProperty("user.dir") + "/" + arg);
 		if (file.isFile()) {
 			try {
 				Files.delete(file.toPath());
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
-				return "Failed to remove file " + arg;
+				return "Failed to remove file " + arg + "\n";
 			}
-			return "";
+			return "" + "\n";
 		}
-		
-		return "Not such file " + arg;
+
+		return "Not such file " + arg + "\n";
 	}
-	
-	static String diff (String arg1, String arg2) {
-		String[] a=System.getProperty("os.name").split(" ");
+
+	String diff(String arg1, String arg2) {
+		String output = "";
+
+		String[] a = System.getProperty("os.name").split(" ");
 		try {
-	        String line;
-	        Process p;
-			switch (a[0]){
+			String line;
+			Process p;
+			switch (a[0]) {
 			case "Windows":
-				p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"FC " +arg1+" "+arg2);
+				p = Runtime.getRuntime().exec(
+						System.getenv("windir") + "\\system32\\" + "FC " + arg1
+								+ " " + arg2);
 				break;
 			default:
-				p = Runtime.getRuntime().exec("diff " + arg1 +" "+arg2);
+				p = Runtime.getRuntime().exec("diff " + arg1 + " " + arg2);
 				break;
 			}
-	        BufferedReader input =
-	                new BufferedReader(new InputStreamReader(p.getInputStream()));
-	        while ((line = input.readLine()) != null) {
-	            output.println(line); //<-- Parse data here.
-	        }
-	        input.close();
-	    } catch (Exception err) {
-	        return err.toString();
-	    }
-		
-		
-		return "";
-	
+			BufferedReader input = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			while ((line = input.readLine()) != null) {
+				output += line + "\n";
+			}
+			input.close();
+		} catch (Exception err) {
+			return err.toString();
+		}
+
+		return "" + "\n";
+
 	}
-	
-	//TODO: figure this out for GUI
-	static String more(String arg, int width, int height) {
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+
+	// TODO: figure this out for GUI
+	String more(String arg, int width, int height) {
+		String output = "";
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(
+				System.in));
 		BufferedReader filein;
 		try {
 			filein = new BufferedReader(new FileReader(arg));
@@ -249,9 +251,9 @@ public class myShell {
 		String line;
 		int lines = 0;
 		String screen = "";
-		
+
 		try {
-			do  {
+			do {
 				while (lines <= height && filein.ready()) {
 					line = filein.readLine();
 					while (line != null && line.length() > width) {
@@ -262,42 +264,43 @@ public class myShell {
 					screen += line + "\n";
 					lines++;
 				}
-				output.println(screen);
+				output += screen + "\n";
 			} while (stdin.readLine() != null && filein.ready());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return "" + "\n";
 	}
-	
-	static String wc(String arg) {
+
+	String wc(String arg) {
 		BufferedReader in = null;
 		String a;
 		String[] words;
-		int cha=0;
-		int word=0;
-		int lines=0;
-		try{
+		int cha = 0;
+		int word = 0;
+		int lines = 0;
+		try {
 			in = new BufferedReader(new FileReader(arg));
-			
-		}catch (IOException e) {
+
+		} catch (IOException e) {
 			try {
-				in = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/" + arg));
+				in = new BufferedReader(new FileReader(
+						System.getProperty("user.dir") + "/" + arg));
 			} catch (FileNotFoundException e1) {
 				return e1.toString();
-				
+
 			}
 		}
 		try {
-			while((a=in.readLine()) != null){
-				words=a.split(" ");
-				word+=words.length;
+			while ((a = in.readLine()) != null) {
+				words = a.split(" ");
+				word += words.length;
 				lines++;
-				for(int t=0;t<words.length;t++){
-					a=words[t];
-					cha+=a.length();
+				for (int t = 0; t < words.length; t++) {
+					a = words[t];
+					cha += a.length();
 				}
-				
+
 			}
 		} catch (IOException e1) {
 			return e1.toString();
@@ -305,166 +308,171 @@ public class myShell {
 		try {
 			in.close();
 		} catch (IOException e) {
-			
+
 			return e.toString();
 		}
-		return ("number of characters: "+cha+"\nnumber of words: "+word+"\nnumber of lines: "+lines);
+		return "number of characters: " + cha + "\nnumber of words: " + word
+				+ "\nnumber of lines: " + lines + "\n";
 	}
-	
-	static String mkdir(String arg) {
-		if (! (new File(System.getProperty("user.dir") + "/" + arg).mkdir()))
+
+	String mkdir(String arg) {
+		if (!(new File(System.getProperty("user.dir") + "/" + arg).mkdir()))
 			return "Failed to create directory";
-		return "";
+		return "" + "\n";
 	}
-	
-	static String grep(String[] args) {
-			String a;
-			BufferedReader in = null;
-			for(int i=2;i<args.length;i++){
-				try{
-					in = new BufferedReader(new FileReader(args[i]));
-					
-				}catch (IOException e) {
-					try {
-						in = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/" + args[i]));
-					} catch (FileNotFoundException e1) {
-						return e1.toString();
-						
-					}
-				}
+
+	String grep(String[] args) {
+		String output = "";
+		String a;
+		BufferedReader in = null;
+		for (int i = 2; i < args.length; i++) {
+			try {
+				in = new BufferedReader(new FileReader(args[i]));
+
+			} catch (IOException e) {
 				try {
-					while((a = in.readLine()) != null){
-						if( a.contains( args[1] )){
-							output.println(a);
-						}
-							
-						
-					}
-				} catch (IOException e1) {
+					in = new BufferedReader(new FileReader(
+							System.getProperty("user.dir") + "/" + args[i]));
+				} catch (FileNotFoundException e1) {
 					return e1.toString();
-				}
-				try {
-					in.close();
-				} catch (IOException e) {
-					
-					return e.toString();
+
 				}
 			}
-			
-		return "";
+			try {
+				while ((a = in.readLine()) != null) {
+					if (a.contains(args[1])) {
+						output += a + "\n";
+					}
+
+				}
+			} catch (IOException e1) {
+				return e1.toString();
+			}
+			try {
+				in.close();
+			} catch (IOException e) {
+
+				return e.toString();
+			}
+		}
+
+		return "" + "\n";
 	}
-	
-	static String ps() {
-		String[] a=System.getProperty("os.name").split(" ");
+
+	String ps() {
+		String output = "";
+		String[] a = System.getProperty("os.name").split(" ");
 		try {
-	        String line;
-	        Process p;
-			switch (a[0]){
+			String line;
+			Process p;
+			switch (a[0]) {
 			case "Windows":
-				p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+				p = Runtime.getRuntime().exec(
+						System.getenv("windir") + "\\system32\\"
+								+ "tasklist.exe");
 				break;
 			default:
 				p = Runtime.getRuntime().exec("ps -e");
 				break;
 			}
-	        BufferedReader input =
-	                new BufferedReader(new InputStreamReader(p.getInputStream()));
-	        while ((line = input.readLine()) != null) {
-	            output.println(line); //<-- Parse data here.
-	        }
-	        input.close();
-	    } catch (Exception err) {
-	        return err.toString();
-	    }
-		
-		
-		return "";
-	}
-	
-	static String kill(String arg) {
-			try {
-				Runtime r = Runtime.getRuntime();
-				
-				String[] OS = System.getProperty("os.name").split(" ");
-				Process p;
-				switch (OS[0]){
-				case "Windows":
-					p = r.exec("tasklist " + arg);
-					break;
-				default:
-					p = r.exec("kill " + arg);
-					break;
-				}
-				
-				p.waitFor();
-				BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				
-				String outputP = "";
-				String out = "";
-				while ((outputP = b.readLine()) != null) 
-					out += outputP + "\n";
-				return out;
-			} catch (IOException e) {
-				return "Process could not be killed";
-			} catch (InterruptedException e) {
-				return "Interrupted while killing process";
+			BufferedReader input = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			while ((line = input.readLine()) != null) {
+				output += line + "\n"; // <-- Parse data here.
 			}
+			input.close();
+		} catch (Exception err) {
+			return err.toString();
+		}
+
+		return "" + "\n";
 	}
-	
-	static String whoami() {
-		return System.getProperty("user.name");
+
+	String kill(String arg) {
+		try {
+			Runtime r = Runtime.getRuntime();
+
+			String[] OS = System.getProperty("os.name").split(" ");
+			Process p;
+			switch (OS[0]) {
+			case "Windows":
+				p = r.exec("tasklist " + arg);
+				break;
+			default:
+				p = r.exec("kill " + arg);
+				break;
+			}
+
+			p.waitFor();
+			BufferedReader b = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+
+			String outputP = "";
+			String out = "";
+			while ((outputP = b.readLine()) != null)
+				out += outputP + "\n";
+			return out;
+		} catch (IOException e) {
+			return "Process could not be killed" + "\n";
+		} catch (InterruptedException e) {
+			return "Interrupted while killing process" + "\n";
+		}
 	}
-	
-	static String env() {
+
+	String whoami() {
+		return System.getProperty("user.name") + "\n";
+	}
+
+	String env() {
 		Map<String, String> env = System.getenv();
 		String output = "";
 		for (Map.Entry<String, String> entry : env.entrySet())
 			output += entry.getKey() + "=" + entry.getValue() + "\n";
 		return output;
 	}
-	
-	
-	static int talk(String arg) {
+
+	int talk(String arg) {
+		String output = "";
 		String[] args = arg.split(":");
-		if (args.length != 2){
-			output.println("argument " + arg + " is not correct");
+		if (args.length != 2) {
+			output += "argument " + arg + " is not correct" + "\n";
 			return -1;
 		}
-		
+
 		ServerSocket listener = null;
 		Socket echoSocket = null;
-		BufferedReader in = null; 
+		Scanner in = null;
 		PrintWriter out = null;
 		Socket clientSocket;
-		
-		//client
+
+		// client
 		try {
 			echoSocket = new Socket(args[0], Integer.parseInt(args[1]));
-			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
-			//out = new PrintWriter(echoSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
-			input = in;
-			//output = out;
+			in = new Scanner(echoSocket.getInputStream());
+			// out = new PrintWriter(echoSocket.getOutputStream(), true);
+			// in = new Scanner(echoSocket.getInputStream());
+			// input = in;
+			// output = out;
 			return 0;
 		} catch (Exception e) {
-			output.println("Could not connect to " + args[0] + ":" + args[1]);
-			output.println("Creating server");
+			output += "Could not connect to " + args[0] + ":" + args[1] + "\n";
+			output += "Creating server" + "\n";
 		}
-		
-		//server
+
+		// server
 		try {
 			listener = new ServerSocket(Integer.parseInt(args[1]));
 			clientSocket = listener.accept();
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			//in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			output = out;
+			// in = new BufferedReader(new
+			// InputStreamReader(clientSocket.getInputStream()));
+			// output = out;
 
 		} catch (Exception e) {
-			output.println("Could not connect to " + args[0] + ":" + args[1]);
+			output += "Could not connect to " + args[0] + ":" + args[1] + "\n";
 			return -1;
 		}
-		return 0;    
+		return 0;
 	}
-}	
 
-
+}
