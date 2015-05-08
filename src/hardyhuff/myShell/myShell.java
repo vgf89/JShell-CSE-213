@@ -11,10 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
 import java.net.Socket;
 import java.net.ServerSocket;
 
 public class myShell {
+	
+
+	
 	public String runCommand(String command) {
 		String[] arguments;
 		String output = command + "\n";
@@ -41,7 +45,7 @@ public class myShell {
 			output += diff(arguments[1], arguments[2]);
 			break;
 		case "more":
-			output += more(arguments[1], 80, 10);
+			//output += more(arguments[1], 80, 10);
 			break;
 		case "wc":
 			output += wc(arguments[1]);
@@ -101,13 +105,22 @@ public class myShell {
 
 	String ls() {
 		String s = "";
+		int linelength = 0;
 		File workdir = new File(System.getProperty("user.dir"));
 		String[] fileList = workdir.list();
 		for (String file : fileList) {
-			if (s.length() == 0)
+			if (s.length() == 0) {
 				s += file;
-			else
-				s += " " + file;
+				linelength += file.length();
+			} else {
+				if (linelength + file.length() + 1 <= ShellWindow.width) {
+					s += " " + file;
+					linelength += 1 + file.length();
+				} else {
+					s += "\n" + file;
+					linelength = file.length();
+				}
+			}
 		}
 
 		return s + "\n";
@@ -236,41 +249,7 @@ public class myShell {
 	}
 
 	// TODO: figure this out for GUI
-	String more(String arg, int width, int height) {
-		String output = "";
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(
-				System.in));
-		BufferedReader filein;
-		try {
-			filein = new BufferedReader(new FileReader(arg));
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return "Failed";
-		}
-		String line;
-		int lines = 0;
-		String screen = "";
-
-		try {
-			do {
-				while (lines <= height && filein.ready()) {
-					line = filein.readLine();
-					while (line != null && line.length() > width) {
-						screen += line.substring(0, width - 2) + "\n";
-						line = line.substring(width - 1);
-						lines++;
-					}
-					screen += line + "\n";
-					lines++;
-				}
-				output += screen + "\n";
-			} while (stdin.readLine() != null && filein.ready());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return "" + "\n";
-	}
+	
 
 	String wc(String arg) {
 		BufferedReader in = null;
@@ -474,5 +453,7 @@ public class myShell {
 		}
 		return 0;
 	}
+
+
 
 }
