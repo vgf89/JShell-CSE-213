@@ -1,5 +1,10 @@
 package hardyhuff.myShell;
-
+/**
+ * @author David Huff
+ * @author Kevin Hard
+ * @date 5-8-2015
+ * @kill may or may not work
+ */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,11 +21,16 @@ import java.net.ServerSocket;
 
 public class myShell {
 	
-
+	/**
+	 * command evaluation
+	 * @param command
+	 * @return returns output to the Window 
+	 */
 	
 	public String runCommand(String command) {
 		String[] arguments;
-		String output = "\n";
+
+		String output = "\n";//command + "\n";
 		arguments = command.split(" ");
 		switch (arguments[0]) {
 		case "":
@@ -72,7 +82,11 @@ public class myShell {
 		output += System.getProperty("user.dir") + "$ ";
 		return output;
 	}
-
+	/**
+	 * cd command
+	 * @param directory 
+	 * @return output
+	 */
 	String cd(String arg) {
 		File file = new File(arg);
 		if (file.isDirectory() && file.exists()) {
@@ -95,7 +109,10 @@ public class myShell {
 		}
 		return "\nDirectory " + arg + " does not exist\n";
 	}
-
+/**
+ * ls command list the files in the directory
+ * @return output
+ */
 	String ls() {
 		String s = "";
 		int linelength = 0;
@@ -118,7 +135,12 @@ public class myShell {
 
 		return s + "\n";
 	}
-
+/**
+ * copy command
+ * @param taret file
+ * @param destination
+ * @return output
+ */
 	String cp(String arg1, String arg2) {
 		File in = new File(arg1);
 		if (in.isFile()) {
@@ -148,7 +170,12 @@ public class myShell {
 
 		return "File " + arg1 + " not found" + "\n";
 	}
-
+	/**
+	 * move command
+	 * @param target
+	 * @param destination
+	 * @return output
+	 */
 	String mv(String arg1, String arg2) {
 		File mv = new File(arg1);
 		File des = new File(arg2);
@@ -177,9 +204,13 @@ public class myShell {
 			}
 			return "" + "\n";
 		}
-		return null;
+		return "";
 	}
-
+	/**
+	 *  remove command
+	 * @param file 
+	 * @return output
+	 */
 	String rm(String arg) {
 		File file = new File(arg);
 		if (file.isFile()) {
@@ -208,6 +239,13 @@ public class myShell {
 		return "Not such file " + arg + "\n";
 	}
 
+
+	/**
+	 * 	diff compares 
+	 * @param file 1
+	 * @param file 2 
+	 * @return output if any
+	 */
 	String diff(String arg1, String arg2) {
 		String output = "";
 		
@@ -219,7 +257,7 @@ public class myShell {
 			switch (a[0]) {
 			case "Windows":
 				p = Runtime.getRuntime().exec(
-						System.getenv("windir") + "\\system32\\" + "FC " + arg1
+						 "C:\\Windows\\system32\\" + "FC " + arg1
 								+ " " + arg2);
 				break;
 			default:
@@ -243,7 +281,11 @@ public class myShell {
 		return output;
 
 	}
-
+/**
+ * word count command 
+ * @param arg file 1
+ * @return output
+ */
 	String wc(String arg) {
 		BufferedReader in = null;
 		String a;
@@ -286,13 +328,21 @@ public class myShell {
 		return "number of characters: " + cha + "\nnumber of words: " + word
 				+ "\nnumber of lines: " + lines + "\n";
 	}
-
+	/**
+	 * make directory
+	 * @param name of the new directory
+	 * @return output
+	 */
 	String mkdir(String arg) {
 		if (!(new File(System.getProperty("user.dir") + "/" + arg).mkdir()))
 			return "Failed to create directory";
 		return "";
 	}
-
+	/**
+	 * searches files given for matching string 
+	 * @param first args is the matching string the rest are file names
+	 * @return output
+	 */
 	String grep(String[] args) {
 		String output = "";
 		String a;
@@ -335,7 +385,10 @@ public class myShell {
 
 		return output;
 	}
-
+	/**
+	 * list running processes
+	 * @return output
+	 */
 	String ps() {
 		String output = "";
 		String[] a = System.getProperty("os.name").split(" ");
@@ -364,7 +417,12 @@ public class myShell {
 
 		return output;
 	}
-
+	/**
+	 * kill command
+	 * @bugs kill might not work for windows
+	 * @param process
+	 * @return output
+	 */
 	String kill(String arg) {
 		try {
 			Runtime r = Runtime.getRuntime();
@@ -376,7 +434,7 @@ public class myShell {
 				p = r.exec("tasklist " + arg);
 				break;
 			default:
-				p = r.exec("kill " + arg);
+				p = r.exec("kill " +" -9 "+arg);
 				break;
 			}
 
@@ -395,11 +453,17 @@ public class myShell {
 			return "Interrupted while killing process" + "\n";
 		}
 	}
-
+	/**
+	 * gets the user name
+	 * @return output
+	 */
 	String whoami() {
 		return System.getProperty("user.name") + "\n";
 	}
-
+	/**
+	 * gets environment information
+	 * @return output
+	 */
 	String env() {
 		Map<String, String> env = System.getenv();
 		String output = "";
