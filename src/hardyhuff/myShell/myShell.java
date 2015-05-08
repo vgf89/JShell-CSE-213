@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
 import java.net.Socket;
 import java.net.ServerSocket;
 
@@ -21,7 +20,7 @@ public class myShell {
 	
 	public String runCommand(String command) {
 		String[] arguments;
-		String output = command + "\n";
+		String output = "\n";
 		arguments = command.split(" ");
 		switch (arguments[0]) {
 		case "":
@@ -44,9 +43,6 @@ public class myShell {
 		case "diff":
 			output += diff(arguments[1], arguments[2]);
 			break;
-		case "more":
-			//output += more(arguments[1], 80, 10);
-			break;
 		case "wc":
 			output += wc(arguments[1]);
 			break;
@@ -54,10 +50,7 @@ public class myShell {
 			output += mkdir(arguments[1]);
 			break;
 		case "grep":
-			grep(arguments);
-			break;
-		case "talk":
-			talk(arguments[1]);
+			output += grep(arguments);
 			break;
 		case "ps":
 			output += ps();
@@ -74,7 +67,7 @@ public class myShell {
 		case "exit":
 			System.exit(0);
 		default:
-			output += "Unknown Command" + "\n";
+			output += "Unknown Command or incorrect arguments" + "\n";
 		}
 		output += System.getProperty("user.dir") + "$ ";
 		return output;
@@ -100,7 +93,7 @@ public class myShell {
 			}
 			return "" + "\n";
 		}
-		return "Directory " + arg + " does not exist";
+		return "\nDirectory " + arg + " does not exist\n";
 	}
 
 	String ls() {
@@ -113,7 +106,7 @@ public class myShell {
 				s += file;
 				linelength += file.length();
 			} else {
-				if (linelength + file.length() + 1 <= ShellWindow.width) {
+				if (linelength + file.length() + 1 <= ShellWindow.textarea.getColumns()) {
 					s += " " + file;
 					linelength += 1 + file.length();
 				} else {
@@ -134,8 +127,7 @@ public class myShell {
 				Files.copy(in.toPath(), out.toPath(),
 						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				return "Failed to copy file " + arg1 + " to " + arg2 + "\n";
 			}
 			return "" + "\n";
@@ -148,8 +140,7 @@ public class myShell {
 				Files.copy(in.toPath(), out.toPath(),
 						StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
 				return "Failed to copy file " + arg1 + " to " + arg2 + "\n";
 			}
 			return "" + "\n";
@@ -219,6 +210,7 @@ public class myShell {
 
 	String diff(String arg1, String arg2) {
 		String output = "";
+		
 
 		String[] a = System.getProperty("os.name").split(" ");
 		try {
@@ -231,25 +223,26 @@ public class myShell {
 								+ " " + arg2);
 				break;
 			default:
-				p = Runtime.getRuntime().exec("diff " + arg1 + " " + arg2);
+				p = Runtime.getRuntime().exec("/usr/bin/diff " + System.getProperty("user.dir") + "/" + arg1 + " " + System.getProperty("user.dir") + "/" + arg2);
 				break;
 			}
+			ShellWindow.textarea.append("Test4");
 			BufferedReader input = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
+
+			
 			while ((line = input.readLine()) != null) {
 				output += line + "\n";
 			}
+			p.waitFor();
 			input.close();
 		} catch (Exception err) {
 			return err.toString();
 		}
 
-		return "" + "\n";
+		return output;
 
 	}
-
-	// TODO: figure this out for GUI
-	
 
 	String wc(String arg) {
 		BufferedReader in = null;
@@ -297,7 +290,7 @@ public class myShell {
 	String mkdir(String arg) {
 		if (!(new File(System.getProperty("user.dir") + "/" + arg).mkdir()))
 			return "Failed to create directory";
-		return "" + "\n";
+		return "";
 	}
 
 	String grep(String[] args) {
@@ -313,7 +306,7 @@ public class myShell {
 					in = new BufferedReader(new FileReader(
 							System.getProperty("user.dir") + "/" + args[i]));
 				} catch (FileNotFoundException e1) {
-					return e1.toString();
+					return e1.toString() + "\n";
 
 				}
 			}
@@ -325,6 +318,11 @@ public class myShell {
 
 				}
 			} catch (IOException e1) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					return e.toString();
+				}
 				return e1.toString();
 			}
 			try {
@@ -335,7 +333,7 @@ public class myShell {
 			}
 		}
 
-		return "" + "\n";
+		return output;
 	}
 
 	String ps() {
@@ -351,7 +349,7 @@ public class myShell {
 								+ "tasklist.exe");
 				break;
 			default:
-				p = Runtime.getRuntime().exec("ps -e");
+				p = Runtime.getRuntime().exec("/usr/bin/ps -e");
 				break;
 			}
 			BufferedReader input = new BufferedReader(new InputStreamReader(
@@ -364,7 +362,7 @@ public class myShell {
 			return err.toString();
 		}
 
-		return "" + "\n";
+		return output;
 	}
 
 	String kill(String arg) {
@@ -409,51 +407,4 @@ public class myShell {
 			output += entry.getKey() + "=" + entry.getValue() + "\n";
 		return output;
 	}
-
-	int talk(String arg) {
-		String output = "";
-		String[] args = arg.split(":");
-		if (args.length != 2) {
-			output += "argument " + arg + " is not correct" + "\n";
-			return -1;
-		}
-
-		ServerSocket listener = null;
-		Socket echoSocket = null;
-		Scanner in = null;
-		PrintWriter out = null;
-		Socket clientSocket;
-
-		// client
-		try {
-			echoSocket = new Socket(args[0], Integer.parseInt(args[1]));
-			in = new Scanner(echoSocket.getInputStream());
-			// out = new PrintWriter(echoSocket.getOutputStream(), true);
-			// in = new Scanner(echoSocket.getInputStream());
-			// input = in;
-			// output = out;
-			return 0;
-		} catch (Exception e) {
-			output += "Could not connect to " + args[0] + ":" + args[1] + "\n";
-			output += "Creating server" + "\n";
-		}
-
-		// server
-		try {
-			listener = new ServerSocket(Integer.parseInt(args[1]));
-			clientSocket = listener.accept();
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			// in = new BufferedReader(new
-			// InputStreamReader(clientSocket.getInputStream()));
-			// output = out;
-
-		} catch (Exception e) {
-			output += "Could not connect to " + args[0] + ":" + args[1] + "\n";
-			return -1;
-		}
-		return 0;
-	}
-
-
-
 }
