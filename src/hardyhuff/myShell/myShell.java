@@ -1,9 +1,10 @@
 package hardyhuff.myShell;
 /**
  * @author David Huff
- * @author Kevin Hard
+ * @author Kevin Hardy
  * @date 5-8-2015
  */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,6 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
+/**
+ * Class to handle regular, non-threaded commands
+ */
 public class myShell {
 	
 	/**
@@ -103,6 +107,7 @@ public class myShell {
 		}
 		return "\nDirectory " + arg + " does not exist\n";
 	}
+	
 	/**
 	 * ls command list the files in the directory
 	 * @return output
@@ -129,6 +134,7 @@ public class myShell {
 
 		return s + "\n";
 	}
+	
 	/**
 	 * copy command
 	 * @param taret file
@@ -164,6 +170,7 @@ public class myShell {
 
 		return "File " + arg1 + " not found" + "\n";
 	}
+	
 	/**
 	 * move command
 	 * @param target
@@ -200,6 +207,7 @@ public class myShell {
 		}
 		return "";
 	}
+	
 	/**
 	 * remove command
 	 * @param file 
@@ -275,11 +283,12 @@ public class myShell {
 		return output;
 
 	}
-/**
- * word count command 
- * @param arg file 1
- * @return output
- */
+	
+	/**
+	 * word count command 
+	 * @param arg file 1
+	 * @return output
+	 */
 	String wc(String arg) {
 		BufferedReader in = null;
 		String a;
@@ -322,6 +331,7 @@ public class myShell {
 		return "number of characters: " + cha + "\nnumber of words: " + word
 				+ "\nnumber of lines: " + lines + "\n";
 	}
+	
 	/**
 	 * make directory
 	 * @param name of the new directory
@@ -332,6 +342,7 @@ public class myShell {
 			return "Failed to create directory";
 		return "";
 	}
+	
 	/**
 	 * searches files given for matching string 
 	 * @param first args is the matching string the rest are file names
@@ -379,6 +390,7 @@ public class myShell {
 
 		return output;
 	}
+	
 	/**
 	 * list running processes
 	 * @return output
@@ -411,6 +423,7 @@ public class myShell {
 
 		return output;
 	}
+	
 	/**
 	 * kill command
 	 * @bugs kill might not work for windows
@@ -447,6 +460,7 @@ public class myShell {
 			return "Interrupted while killing process" + "\n";
 		}
 	}
+	
 	/**
 	 * gets the user name
 	 * @return output
@@ -454,6 +468,7 @@ public class myShell {
 	String whoami() {
 		return System.getProperty("user.name") + "\n";
 	}
+	
 	/**
 	 * gets environment information
 	 * @return output

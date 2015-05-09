@@ -1,9 +1,10 @@
 package hardyhuff.myShell;
 /**
  * @author David Huff
- * @author Kevin Hard
+ * @author Kevin Hardy
  * @date 5-8-2015
  */
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,6 +24,9 @@ import java.net.UnknownHostException;
 
 import javax.swing.*;
 
+/**
+ * Class to show the Shell window, also the main() entry point for the program
+ */
 public class ShellWindow {
 	public static JTextArea textarea;
 	private JTextField textfield;
@@ -39,7 +43,7 @@ public class ShellWindow {
 	public static String message = new String();
 
 	/**
-	 * Main Window
+	 * Instantiates the Main Window
 	 */
 	public ShellWindow() {
 		
