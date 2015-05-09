@@ -373,7 +373,7 @@ public class myShell {
 			Process p;
 			switch (OS[0]) {
 			case "Windows":
-				p = r.exec("tasklist " + arg);
+				p = r.exec("taskkill " + arg);
 				break;
 			default:
 				p = r.exec("kill " + arg);
