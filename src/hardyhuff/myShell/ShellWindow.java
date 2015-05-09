@@ -1,5 +1,9 @@
 package hardyhuff.myShell;
-
+/**
+ * @author David Huff
+ * @author Kevin Hard
+ * @date 5-8-2015
+ */
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
