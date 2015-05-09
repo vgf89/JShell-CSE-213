@@ -426,7 +426,6 @@ public class myShell {
 	
 	/**
 	 * kill command
-	 * @bugs kill might not work for windows
 	 * @param process
 	 * @return output
 	 */
