@@ -3,7 +3,6 @@ package hardyhuff.myShell;
  * @author David Huff
  * @author Kevin Hard
  * @date 5-8-2015
- * @kill may or may not work
  */
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,11 +17,10 @@ import java.util.Map;
 public class myShell {
 	
 	/**
-	 * command evaluation
+	 * Evaluates a command string and run the proper command.
 	 * @param command
 	 * @return returns output to the Window 
 	 */
-	
 	public String runCommand(String command) {
 		String[] arguments;
 
@@ -78,6 +76,7 @@ public class myShell {
 		output += System.getProperty("user.dir") + "$ ";
 		return output;
 	}
+
 	/**
 	 * cd command
 	 * @param directory 
@@ -89,7 +88,6 @@ public class myShell {
 			try {
 				System.setProperty("user.dir", file.getCanonicalPath());
 			} catch (IOException e) {
-
 				e.printStackTrace();
 			}
 			return "" + "\n";
@@ -105,10 +103,10 @@ public class myShell {
 		}
 		return "\nDirectory " + arg + " does not exist\n";
 	}
-/**
- * ls command list the files in the directory
- * @return output
- */
+	/**
+	 * ls command list the files in the directory
+	 * @return output
+	 */
 	String ls() {
 		String s = "";
 		int linelength = 0;
@@ -131,12 +129,12 @@ public class myShell {
 
 		return s + "\n";
 	}
-/**
- * copy command
- * @param taret file
- * @param destination
- * @return output
- */
+	/**
+	 * copy command
+	 * @param taret file
+	 * @param destination
+	 * @return output
+	 */
 	String cp(String arg1, String arg2) {
 		File in = new File(arg1);
 		if (in.isFile()) {
@@ -203,7 +201,7 @@ public class myShell {
 		return "";
 	}
 	/**
-	 *  remove command
+	 * remove command
 	 * @param file 
 	 * @return output
 	 */

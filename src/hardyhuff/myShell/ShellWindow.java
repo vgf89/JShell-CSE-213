@@ -43,7 +43,6 @@ public class ShellWindow {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException
 				| IllegalAccessException | UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -51,6 +50,7 @@ public class ShellWindow {
 
 		Font font = new Font(Font.MONOSPACED, Font.PLAIN, 14);
 
+		/* create the text area component (output) */
 		textarea = new JTextArea(System.getProperty("user.dir") + "$ ", height,
 				width);
 		textarea.setFont(font);;
@@ -62,10 +62,12 @@ public class ShellWindow {
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
+		/* create the input field */
 		textfield = new JTextField(width);
 		textfield.setFont(font);
 		textfield.addActionListener(new TextFieldListener(textarea));
 
+		/* Add the components to the frame, make it visible */
 		frame.setComponentOrientation(java.awt.ComponentOrientation.RIGHT_TO_LEFT);
 
 		frame.setResizable(false);
@@ -74,12 +76,19 @@ public class ShellWindow {
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		
 	}
 
+	/**
+	 * Listens for the TextField to get an Enter
+	 * @author kevin
+	 */
 	private class TextFieldListener implements ActionListener {
 		private JTextArea textarea;
 
+		/**
+		 * Creates the textfield listener object
+		 * @param textarea
+		 */
 		public TextFieldListener(JTextArea textarea) {
 			this.textarea = textarea;
 		}
@@ -89,6 +98,7 @@ public class ShellWindow {
 			str = textfield.getText();
 			textfield.setText("");
 			
+			/* Check if either the more thread exists, or handle the talk command, otherwise use the normal command handler in myShell */
 			if (t != null && t.isAlive()) {
 				synchronized (obj) {
 					obj.notify();
@@ -97,11 +107,13 @@ public class ShellWindow {
 				t = new MoreThread(str.split(" ")[1], textarea.getColumns(), textarea.getRows());
 				t.start();
 			} else if (talkClient != null || talkServer != null) {
+				/* if the talk client or talk server exist, change the message and signal the thread to run */
 				synchronized (obj){
 					message = str + "\n";
 					obj.notify();
 				}
 			} else if (str.split(" ")[0].matches("talk") && str.split(" ").length >= 2 && str.split(" ")[1].split(":").length == 2) {
+					/* make the talk client thread, or if that fails, make the server thread instead */
 					try {
 						talkClient = new TalkClient(str.split(" ")[1]);
 						talkClient.createSocket();
@@ -111,15 +123,18 @@ public class ShellWindow {
 						talkServer.createSocket();
 					}
 			} else {
+				/* run a normal, non-threaded command and print its output */
 				textarea.append(str);
 				textarea.append(shell.runCommand(str));
 			}
 
+			/* make sure the text area is scrolled down after a command is run */
 			textarea.setCaretPosition(textarea.getDocument().getLength());
 		}
 
 	}
 
+	/* Main entry point */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -128,18 +143,26 @@ public class ShellWindow {
 		});
 	}
 
-	
+	/**
+	 * Thread to run the "more" command so that the GUI isn't blocked
+	 * @author kevin
+	 *
+	 */
 	public class MoreThread extends Thread {
 		String arg = "";
 		int width = 80;
 		int height = 10;
 		
 		
+		/**
+		 *  Instantiates MoreThread class
+		 */
 		public MoreThread(String arg, int width, int height) {
 			this.arg = arg;
 			this.width = width;
 			this.height = height;
 		}
+
 
 		@Override
 		public void run() {
@@ -147,6 +170,7 @@ public class ShellWindow {
 			BufferedReader stdin = new BufferedReader(new InputStreamReader(
 					System.in));
 			BufferedReader filein = null;
+			
 			try {
 				filein = new BufferedReader(new FileReader(arg));
 			} catch (FileNotFoundException e1) {
@@ -158,6 +182,7 @@ public class ShellWindow {
 					return;
 				}
 			}
+			
 			String line;
 			int lines = 0;
 			String screen = "";
@@ -180,10 +205,12 @@ public class ShellWindow {
 							
 						lines++;
 					}
+					
 					textarea.append(screen);
 					textarea.setCaretPosition(textarea.getDocument().getLength());
 					
 					if (filein.ready()) {
+						/* wait until the thread is notified to update */
 						synchronized(obj) {
 							obj.wait();
 						}
@@ -202,13 +229,10 @@ public class ShellWindow {
 
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Sets up the talk client threads for the talk command
+	 * @author kevin (based on BIJOY's work at http://www.coderpanda.com/chat-application-in-java/)
+	 */
 	public class TalkClient {
 	    private Socket socket = null;
 	    private InputStream inStream = null;
@@ -216,12 +240,21 @@ public class ShellWindow {
 	    private String address;
 	    private int port; 
 	    
+	    /**
+	     * Sets the address and port for the talk client
+	     * @param arg address:port
+	     */
 	    TalkClient(String arg) {
 	    	String[] args = arg.split(":");
 	    	address = args[0];
 	    	port = Integer.valueOf(args[1]);
 	    }
 
+	    /**
+	     * Tries to create the socket, throws an exception if it fails
+	     * @throws UnknownHostException
+	     * @throws IOException
+	     */
 	    public void createSocket() throws UnknownHostException, IOException {
 	        socket = new Socket(address, port);
 	        textarea.append("\nConnected\n");
@@ -231,6 +264,9 @@ public class ShellWindow {
 	        createWriteThread();
 	    }
 
+	    /**
+	     * Creates the read thread for the client
+	     */
 	    public void createReadThread() {
 	        Thread readThread = new Thread() {
 	            public void run() {
@@ -272,6 +308,9 @@ public class ShellWindow {
 	        readThread.start();
 	    }
 
+	    /**
+	     * Creates the write thread for the client
+	     */
 	    public void createWriteThread() {
 	        Thread writeThread = new Thread() {
 	            public void run() {
@@ -306,7 +345,10 @@ public class ShellWindow {
 	
 	
 	
-	
+	/**
+	 * Sets up the talk server threads for the talk command
+	 * @author kevin (based on BIJOY's work at http://www.coderpanda.com/chat-application-in-java/)
+	 */
 	public class TalkServer {
 		private ServerSocket severSocket;
 		private Socket socket;
@@ -314,6 +356,10 @@ public class ShellWindow {
 		private OutputStream outStream;
 	    private int port; 
 	    
+	    /**
+	     * Sets the port for the talk server
+	     * @param arg address:port (address is ignored but it needs to be there to make processing simpler
+	     */
 	    TalkServer(String arg) {
 	    	String[] args = arg.split(":");
 	    	port = Integer.valueOf(args[1]);
@@ -345,6 +391,9 @@ public class ShellWindow {
 			
 		}
 
+		/**
+		 * Creates the read thread for the server
+		 */
 		public void createReadThread() {
 			Thread readThread = new Thread() {
 				public void run() {
@@ -386,6 +435,9 @@ public class ShellWindow {
 			readThread.start();
 		}
 
+		/**
+		 * Creates the write thread for the server
+		 */
 		public void createWriteThread() {
 			Thread writeThread = new Thread() {
 				public void run() {
@@ -415,7 +467,6 @@ public class ShellWindow {
 			};
 			writeThread.setPriority(Thread.MAX_PRIORITY);
 			writeThread.start();
-
 		}
 	}
 
